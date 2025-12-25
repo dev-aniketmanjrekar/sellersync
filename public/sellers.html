@@ -167,16 +167,20 @@
             try {
                 const response = await api.get('/sellers');
                 sellers = response;
-
-                // Load stock summary for each seller
-                const summaryResp = await api.get('/stock/summary');
-                if (summaryResp.sellerSummary) {
-                    summaryResp.sellerSummary.forEach(s => {
-                        stockSummary[s.id] = s;
-                    });
-                }
-
                 renderSellers();
+
+                // Load stock summary separately (so it doesn't break sellers loading)
+                try {
+                    const summaryResp = await api.get('/stock/summary');
+                    if (summaryResp && summaryResp.sellerSummary) {
+                        summaryResp.sellerSummary.forEach(s => {
+                            stockSummary[s.id] = s;
+                        });
+                        renderSellers(); // Re-render with stock data
+                    }
+                } catch (stockError) {
+                    console.log('Stock summary not available yet');
+                }
             } catch (error) {
                 showToast('Error loading sellers', 'error');
             }
