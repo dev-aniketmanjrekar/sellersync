@@ -213,18 +213,18 @@
                         </div>
                     </div>
                     <div class="form-group" style="margin-top: var(--space-md);">
-                        <label class="form-label">Receipt / Proof Image</label>
-                        <div class="image-upload-area" id="imageUploadArea">
-                            <input type="file" id="paymentImage" accept="image/*" style="display: none;"
-                                onchange="previewImage(this)">
-                            <div class="image-preview" id="imagePreview">
-                                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5"
-                                    viewBox="0 0 24 24">
-                                    <path
-                                        d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                                </svg>
-                                <span>Tap to upload image</span>
-                            </div>
+                        <label class="form-label">Receipt Image (Google Drive Link)</label>
+                        <input type="url" class="form-input" id="paymentImageUrl"
+                            placeholder="Paste Google Drive shareable link here"
+                            onchange="previewDriveImage(this.value)">
+                        <small style="color: var(--gray-500); font-size: 0.75rem;">
+                            Share image on Drive → Get Link → Paste here
+                        </small>
+                        <div id="imagePreviewContainer" style="margin-top: var(--space-sm); display: none;">
+                            <img id="driveImagePreview" style="max-height: 100px; border-radius: var(--radius-md);"
+                                alt="Preview">
+                            <button type="button" class="btn btn-sm btn-danger" onclick="clearImageLink()"
+                                style="margin-left: var(--space-sm);">Remove</button>
                         </div>
                     </div>
                 </form>
@@ -406,16 +406,49 @@
             document.getElementById('paymentForm').reset();
             document.getElementById('paymentId').value = '';
             document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0];
-            resetImagePreview();
+            document.getElementById('paymentImageUrl').value = '';
+            clearImagePreview();
             document.getElementById('paymentModal').classList.add('active');
         }
 
         function closePaymentModal() {
             document.getElementById('paymentModal').classList.remove('active');
-            resetImagePreview();
         }
 
-        let currentImageDataUrl = null;
+        // Google Drive link functions
+        function convertDriveLinkToDirectUrl(shareableLink) {
+            // Convert Drive share link to direct image URL
+            // https://drive.google.com/file/d/FILE_ID/view?usp=sharing
+            // to: https://drive.google.com/uc?export=view&id=FILE_ID
+            const match = shareableLink.match(/\/d\/([a-zA-Z0-9_-]+)/);
+            if (match) {
+                return 'https://drive.google.com/uc?export=view&id=' + match[1];
+            }
+            return shareableLink; // Return as-is if not a Drive link
+        }
+
+        function previewDriveImage(url) {
+            if (!url) {
+                clearImagePreview();
+                return;
+            }
+            const directUrl = convertDriveLinkToDirectUrl(url);
+            const container = document.getElementById('imagePreviewContainer');
+            const img = document.getElementById('driveImagePreview');
+            img.src = directUrl;
+            container.style.display = 'flex';
+            container.style.alignItems = 'center';
+        }
+
+        function clearImageLink() {
+            document.getElementById('paymentImageUrl').value = '';
+            clearImagePreview();
+        }
+
+        function clearImagePreview() {
+            document.getElementById('imagePreviewContainer').style.display = 'none';
+            document.getElementById('driveImagePreview').src = '';
+        }
 
         // Initialize image upload area click handler after DOM is ready
         if (document.getElementById('imageUploadArea')) {
@@ -606,10 +639,12 @@
             document.getElementById('paymentRef').value = payment.reference_number || '';
             document.getElementById('paymentNotes').value = payment.notes || '';
 
-            // Handle existing image
-            resetImagePreview();
+            // Handle existing image (Drive link)
+            document.getElementById('paymentImageUrl').value = payment.image_path || '';
             if (payment.image_path) {
-                showExistingImage(payment.image_path);
+                previewDriveImage(payment.image_path);
+            } else {
+                clearImagePreview();
             }
 
             document.getElementById('paymentModalTitle').textContent = 'Edit Payment';
@@ -618,7 +653,7 @@
 
         async function submitPayment() {
             const id = document.getElementById('paymentId').value;
-            const imageFile = document.getElementById('paymentImage').files[0];
+            const imageUrl = document.getElementById('paymentImageUrl').value.trim();
 
             const sellerId = document.getElementById('paymentSeller').value;
             const amount = document.getElementById('paymentAmount').value;
@@ -633,82 +668,21 @@
             }
 
             try {
-                const token = localStorage.getItem('token');
-
-                // Debug: check file input status
-                const fileInput = document.getElementById('paymentImage');
-                console.log('=== DEBUG submitPayment ===');
-                console.log('Payment ID:', id);
-                console.log('File input element:', fileInput);
-                console.log('Files in input:', fileInput.files);
-                console.log('imageFile variable:', imageFile);
-                console.log('newImageSelected:', newImageSelected);
-                console.log('deleteExistingImage:', deleteExistingImage);
+                const data = {
+                    seller_id: sellerId,
+                    amount: parseFloat(amount),
+                    payment_date: paymentDate,
+                    payment_type: paymentType,
+                    reference_number: referenceNumber,
+                    notes: notes,
+                    image_path: imageUrl || null
+                };
 
                 if (id) {
-                    // Update with FormData for image support
-                    const formData = new FormData();
-                    formData.append('amount', amount);
-                    formData.append('payment_date', paymentDate);
-                    formData.append('payment_type', paymentType);
-                    formData.append('reference_number', referenceNumber);
-                    formData.append('notes', notes);
-
-                    console.log('Image file for update:', imageFile);
-                    if (imageFile) {
-                        formData.append('image', imageFile);
-                        console.log('Image appended for update');
-                    }
-
-                    if (deleteExistingImage) {
-                        formData.append('delete_image', 'true');
-                        console.log('Delete image flag set');
-                    }
-
-                    const response = await fetch(`/api/payments/${id}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        },
-                        body: formData
-                    });
-
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.error || 'Error updating payment');
-                    }
+                    await api.put(`/payments/${id}`, data);
                     showToast('Payment updated successfully', 'success');
                 } else {
-                    // Create new with FormData for image
-                    const formData = new FormData();
-                    formData.append('seller_id', sellerId);
-                    formData.append('amount', amount);
-                    formData.append('payment_date', paymentDate);
-                    formData.append('payment_type', paymentType);
-                    formData.append('reference_number', referenceNumber);
-                    formData.append('notes', notes);
-
-                    console.log('Image file:', imageFile);
-                    if (imageFile) {
-                        formData.append('image', imageFile);
-                        console.log('Image appended to FormData');
-                    } else {
-                        console.log('No image file selected');
-                    }
-
-                    const response = await fetch('/api/payments', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        },
-                        body: formData
-                    });
-
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.error || 'Error adding payment');
-                    }
-
+                    await api.post('/payments', data);
                     showToast('Payment added successfully', 'success');
                 }
                 closePaymentModal();

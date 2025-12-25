@@ -1,9 +1,6 @@
 -- SellerSync Database Schema
 -- Run this file to create the database structure
 
-CREATE DATABASE IF NOT EXISTS sellersync;
-USE sellersync;
-
 -- Users table for authentication and RBAC
 CREATE TABLE IF NOT EXISTS users (
     id INT PRIMARY KEY AUTO_INCREMENT,

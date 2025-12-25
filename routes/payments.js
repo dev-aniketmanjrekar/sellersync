@@ -132,14 +132,10 @@ router.get('/summary', verifyToken, async (req, res) => {
     }
 });
 
-// Record new payment (with optional image)
-router.post('/', verifyToken, managerAccess, upload.single('image'), async (req, res) => {
+// Record new payment (with optional Drive link)
+router.post('/', verifyToken, managerAccess, async (req, res) => {
     try {
-        console.log('--- Payment POST Request ---');
-        console.log('Body:', req.body);
-        console.log('File:', req.file);
-        
-        const { seller_id, amount, payment_date, payment_type, reference_number, notes } = req.body;
+        const { seller_id, amount, payment_date, payment_type, reference_number, notes, image_path } = req.body;
 
         if (!seller_id || !amount || !payment_date) {
             return res.status(400).json({ error: 'Seller ID, amount, and payment date are required.' });
@@ -151,21 +147,14 @@ router.post('/', verifyToken, managerAccess, upload.single('image'), async (req,
             return res.status(404).json({ error: 'Seller not found.' });
         }
 
-        // Get image path if uploaded
-        const imagePath = req.file ? '/uploads/' + req.file.filename : null;
-        console.log('Image path to save:', imagePath);
-
         const [result] = await pool.query(
             'INSERT INTO payments (seller_id, amount, payment_date, payment_type, reference_number, notes, image_path, recorded_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            [seller_id, amount, payment_date, payment_type || 'cash', reference_number || null, notes || null, imagePath, req.user.id]
+            [seller_id, amount, payment_date, payment_type || 'cash', reference_number || null, notes || null, image_path || null, req.user.id]
         );
-
-        console.log('Payment created with ID:', result.insertId);
 
         res.status(201).json({
             message: 'Payment recorded successfully.',
-            paymentId: result.insertId,
-            imagePath: imagePath
+            paymentId: result.insertId
         });
     } catch (error) {
         console.error('Error recording payment:', error);
@@ -173,49 +162,28 @@ router.post('/', verifyToken, managerAccess, upload.single('image'), async (req,
     }
 });
 
-// Update payment (with optional image)
-router.put('/:id', verifyToken, managerAccess, upload.single('image'), async (req, res) => {
+// Update payment (with optional Drive link)
+router.put('/:id', verifyToken, managerAccess, async (req, res) => {
     try {
-        console.log('--- Payment PUT Request ---');
-        console.log('Body:', req.body);
-        console.log('File:', req.file);
-        
-        const { amount, payment_date, payment_type, reference_number, notes, delete_image } = req.body;
+        const { amount, payment_date, payment_type, reference_number, notes, image_path } = req.body;
 
-        // Get image path if uploaded
-        let imagePath = undefined; // undefined = don't change
-        if (req.file) {
-            imagePath = '/uploads/' + req.file.filename;
-            console.log('New image uploaded:', imagePath);
-        } else if (delete_image === 'true') {
-            imagePath = null; // Set to null to delete
-            console.log('Deleting existing image');
-        }
-
-        let query = `UPDATE payments SET 
-            amount = COALESCE(?, amount),
-            payment_date = COALESCE(?, payment_date),
-            payment_type = COALESCE(?, payment_type),
-            reference_number = COALESCE(?, reference_number),
-            notes = COALESCE(?, notes)`;
-        
-        const params = [amount, payment_date, payment_type, reference_number, notes];
-
-        if (imagePath !== undefined) {
-            query += `, image_path = ?`;
-            params.push(imagePath);
-        }
-
-        query += ` WHERE id = ?`;
-        params.push(req.params.id);
-
-        const [result] = await pool.query(query, params);
+        const [result] = await pool.query(
+            `UPDATE payments SET 
+                amount = COALESCE(?, amount),
+                payment_date = COALESCE(?, payment_date),
+                payment_type = COALESCE(?, payment_type),
+                reference_number = ?,
+                notes = ?,
+                image_path = ?
+            WHERE id = ?`,
+            [amount, payment_date, payment_type, reference_number || null, notes || null, image_path || null, req.params.id]
+        );
 
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: 'Payment not found.' });
         }
 
-        res.json({ message: 'Payment updated successfully.', imagePath: imagePath });
+        res.json({ message: 'Payment updated successfully.' });
     } catch (error) {
         console.error('Error updating payment:', error);
         res.status(500).json({ error: 'Server error updating payment.' });
