@@ -326,14 +326,16 @@
                             <tr>
                                 <th>Item Name</th>
                                 <th>Seller</th>
-                                <th>Cost Price</th>
+                                <th>Cost/Unit</th>
+                                <th>Qty</th>
+                                <th>Total Value</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="stockTableBody">
                             <tr>
-                                <td colspan="5" class="empty-state">Loading...</td>
+                                <td colspan="7" class="empty-state">Loading...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -344,9 +346,9 @@
 
     <!-- Add/Edit Stock Modal -->
     <div class="modal-overlay" id="stockModal">
-        <div class="modal" style="max-width: 500px;">
+        <div class="modal" style="max-width: 700px;">
             <div class="modal-header">
-                <h3 id="stockModalTitle">Add Stock Item</h3>
+                <h3 id="stockModalTitle">Add Stock Items</h3>
                 <button class="btn btn-icon btn-secondary" onclick="closeStockModal()">
                     <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path d="M6 18L18 6M6 6l12 12" />
@@ -362,26 +364,35 @@
                             <option value="">Select Seller</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Item Name *</label>
-                        <input type="text" class="form-input" id="stockItemName" placeholder="e.g., Red Silk Saree"
-                            required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Cost Price (₹) *</label>
-                        <input type="number" class="form-input" id="stockCostPrice" placeholder="0.00" step="0.01"
-                            required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Quantity *</label>
-                        <input type="number" class="form-input" id="stockQuantity" placeholder="1" min="1" value="1"
-                            required>
+
+                    <!-- Bulk Items Section -->
+                    <div style="margin-top: 1rem;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                            <label class="form-label" style="margin: 0;">Items</label>
+                            <button type="button" class="btn btn-sm btn-primary" onclick="addStockRow()"
+                                style="padding: 0.25rem 0.75rem;">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                                    viewBox="0 0 24 24" style="margin-right: 4px;">
+                                    <path d="M12 4v16m8-8H4" />
+                                </svg>
+                                Add Row
+                            </button>
+                        </div>
+                        <div id="stockItemsContainer">
+                            <!-- Stock rows will be added here -->
+                        </div>
+                        <div
+                            style="margin-top: 1rem; padding: 0.75rem; background: #f1f5f9; border-radius: 8px; display: flex; justify-content: space-between;">
+                            <span style="font-weight: 500;">Total Stock Value:</span>
+                            <span id="bulkTotalValue" style="font-weight: 700; color: #10b981;">₹0</span>
+                        </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeStockModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="submitStock()">Save Item</button>
+                <button class="btn btn-primary" onclick="submitBulkStock()">Save All Items</button>
             </div>
         </div>
     </div>
@@ -457,15 +468,23 @@
             const tbody = document.getElementById('stockTableBody');
 
             if (stockItems.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No stock items found</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No stock items found</td></tr>';
                 return;
             }
 
-            tbody.innerHTML = stockItems.map(item => `
+            tbody.innerHTML = stockItems.map(item => {
+                const qty = parseInt(item.quantity) || 1;
+                const qtyAvailable = qty - (parseInt(item.quantity_sold) || 0);
+                const costPerUnit = parseFloat(item.cost_price) || 0;
+                const totalValue = costPerUnit * qtyAvailable;
+
+                return `
                 <tr>
                     <td data-label="Item">${item.item_name}</td>
                     <td data-label="Seller">${item.seller_name}</td>
-                    <td data-label="Cost Price" class="amount">₹${parseFloat(item.cost_price).toLocaleString('en-IN')}</td>
+                    <td data-label="Cost/Unit" class="amount">₹${costPerUnit.toLocaleString('en-IN')}</td>
+                    <td data-label="Qty"><strong>${qtyAvailable}</strong>${item.quantity_sold > 0 ? ` <small style="color:#64748b">/ ${qty}</small>` : ''}</td>
+                    <td data-label="Value" class="amount" style="font-weight:600;color:#10b981;">₹${totalValue.toLocaleString('en-IN')}</td>
                     <td data-label="Status">
                         <span class="badge ${item.status === 'in_stock' ? 'badge-success' : 'badge-warning'}">
                             ${item.status === 'in_stock' ? 'In Stock' : 'Sold'}
@@ -495,13 +514,18 @@
                         </div>
                     </td>
                 </tr>
-            `).join('');
+            `}).join('');
         }
 
+        let stockRowCounter = 0;
+
         function openStockModal() {
-            document.getElementById('stockModalTitle').textContent = 'Add Stock Item';
+            document.getElementById('stockModalTitle').textContent = 'Add Stock Items';
             document.getElementById('stockForm').reset();
             document.getElementById('stockId').value = '';
+            document.getElementById('stockItemsContainer').innerHTML = '';
+            stockRowCounter = 0;
+            addStockRow(); // Add first row
             document.getElementById('stockModal').classList.add('active');
         }
 
@@ -509,46 +533,146 @@
             document.getElementById('stockModal').classList.remove('active');
         }
 
+        function addStockRow() {
+            stockRowCounter++;
+            const container = document.getElementById('stockItemsContainer');
+            const row = document.createElement('div');
+            row.id = `stockRow${stockRowCounter}`;
+            row.style.cssText = 'display: grid; grid-template-columns: 2fr 80px 100px 40px; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center;';
+            row.innerHTML = `
+                <input type="text" class="form-input" placeholder="Item Name" data-field="name" style="padding: 0.5rem;">
+                <input type="number" class="form-input" placeholder="Qty" value="1" min="1" data-field="qty" style="padding: 0.5rem;" oninput="calculateBulkTotal()">
+                <input type="number" class="form-input" placeholder="Price" step="0.01" data-field="price" style="padding: 0.5rem;" oninput="calculateBulkTotal()">
+                <button type="button" class="btn btn-sm btn-danger" onclick="removeStockRow(${stockRowCounter})" style="padding: 0.4rem;">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            `;
+            container.appendChild(row);
+            calculateBulkTotal();
+        }
+
+        function removeStockRow(id) {
+            const row = document.getElementById(`stockRow${id}`);
+            if (row) {
+                row.remove();
+                calculateBulkTotal();
+            }
+            // Add back first row if all removed
+            if (document.getElementById('stockItemsContainer').children.length === 0) {
+                addStockRow();
+            }
+        }
+
+        function calculateBulkTotal() {
+            const container = document.getElementById('stockItemsContainer');
+            const rows = container.querySelectorAll('[id^="stockRow"]');
+            let total = 0;
+            rows.forEach(row => {
+                const qty = parseInt(row.querySelector('[data-field="qty"]').value) || 0;
+                const price = parseFloat(row.querySelector('[data-field="price"]').value) || 0;
+                total += qty * price;
+            });
+            document.getElementById('bulkTotalValue').textContent = '₹' + total.toLocaleString('en-IN');
+        }
+
+        async function submitBulkStock() {
+            const sellerId = document.getElementById('stockSeller').value;
+            if (!sellerId) {
+                showToast('Please select a seller', 'error');
+                return;
+            }
+
+            const container = document.getElementById('stockItemsContainer');
+            const rows = container.querySelectorAll('[id^="stockRow"]');
+            const items = [];
+
+            rows.forEach(row => {
+                const name = row.querySelector('[data-field="name"]').value.trim();
+                const qty = parseInt(row.querySelector('[data-field="qty"]').value) || 0;
+                const price = parseFloat(row.querySelector('[data-field="price"]').value) || 0;
+
+                if (name && qty > 0 && price > 0) {
+                    items.push({ item_name: name, quantity: qty, cost_price: price });
+                }
+            });
+
+            if (items.length === 0) {
+                showToast('Please add at least one valid item', 'error');
+                return;
+            }
+
+            try {
+                let added = 0;
+                for (const item of items) {
+                    await api.post('/stock', { seller_id: sellerId, ...item });
+                    added++;
+                }
+                showToast(`${added} item(s) added successfully!`, 'success');
+                closeStockModal();
+                loadStock();
+                loadSummary();
+            } catch (error) {
+                showToast(error.message || 'Error saving stock items', 'error');
+            }
+        }
+
         function editStock(id) {
             const item = stockItems.find(i => i.id === id);
             if (!item) return;
 
+            // For edit, use single item mode
             document.getElementById('stockId').value = item.id;
             document.getElementById('stockSeller').value = item.seller_id;
-            document.getElementById('stockItemName').value = item.item_name;
-            document.getElementById('stockCostPrice').value = item.cost_price;
+            document.getElementById('stockItemsContainer').innerHTML = '';
+            stockRowCounter = 0;
+
+            stockRowCounter++;
+            const container = document.getElementById('stockItemsContainer');
+            const row = document.createElement('div');
+            row.id = `stockRow${stockRowCounter}`;
+            row.style.cssText = 'display: grid; grid-template-columns: 2fr 80px 100px 40px; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center;';
+            row.innerHTML = `
+                <input type="text" class="form-input" placeholder="Item Name" data-field="name" value="${item.item_name}" style="padding: 0.5rem;">
+                <input type="number" class="form-input" placeholder="Qty" value="${item.quantity || 1}" min="1" data-field="qty" style="padding: 0.5rem;" oninput="calculateBulkTotal()">
+                <input type="number" class="form-input" placeholder="Price" value="${item.cost_price}" step="0.01" data-field="price" style="padding: 0.5rem;" oninput="calculateBulkTotal()">
+                <span></span>
+            `;
+            container.appendChild(row);
+            calculateBulkTotal();
 
             document.getElementById('stockModalTitle').textContent = 'Edit Stock Item';
             document.getElementById('stockModal').classList.add('active');
         }
 
         async function submitStock() {
+            // Redirect to bulk submit
             const id = document.getElementById('stockId').value;
-            const data = {
-                seller_id: document.getElementById('stockSeller').value,
-                item_name: document.getElementById('stockItemName').value,
-                cost_price: document.getElementById('stockCostPrice').value,
-                quantity: parseInt(document.getElementById('stockQuantity').value) || 1
-            };
+            if (id) {
+                // Update single item
+                const container = document.getElementById('stockItemsContainer');
+                const row = container.querySelector('[id^="stockRow"]');
+                if (!row) return;
 
-            if (!data.seller_id || !data.item_name || !data.cost_price) {
-                showToast('Please fill all required fields', 'error');
-                return;
-            }
+                const data = {
+                    seller_id: document.getElementById('stockSeller').value,
+                    item_name: row.querySelector('[data-field="name"]').value,
+                    cost_price: parseFloat(row.querySelector('[data-field="price"]').value),
+                    quantity: parseInt(row.querySelector('[data-field="qty"]').value) || 1
+                };
 
-            try {
-                if (id) {
+                try {
                     await api.put(`/stock/${id}`, data);
                     showToast('Stock item updated', 'success');
-                } else {
-                    await api.post('/stock', data);
-                    showToast('Stock item added', 'success');
+                    closeStockModal();
+                    loadStock();
+                    loadSummary();
+                } catch (error) {
+                    showToast(error.message || 'Error updating stock item', 'error');
                 }
-                closeStockModal();
-                loadStock();
-                loadSummary();
-            } catch (error) {
-                showToast(error.message || 'Error saving stock item', 'error');
+            } else {
+                submitBulkStock();
             }
         }
 
