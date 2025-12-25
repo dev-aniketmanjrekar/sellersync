@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SellerSync - Reports</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- Mobile Menu Toggle -->
+    <button class="hamburger" onclick="toggleSidebar()">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12h18M3 6h18M3 18h18" />
+        </svg>
+    </button>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">SS</div>
+                <span class="sidebar-title">SellerSync</span>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    Dashboard
+                </a>
+                <a href="sellers.html" class="nav-item">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path
+                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    Sellers
+                </a>
+                <a href="payments.html" class="nav-item">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path
+                            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    Payments
+                </a>
+                <a href="reports.html" class="nav-item active">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path
+                            d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Reports
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="nav-item" onclick="logout()">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Logout
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <header class="page-header">
+                <div class="page-title">
+                    <h1>Reports</h1>
+                    <p>Generate and export financial reports</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" onclick="exportJSON()">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        Export JSON
+                    </button>
+                    <button class="btn btn-primary" onclick="printReport()">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path
+                                d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                        </svg>
+                        Print Report
+                    </button>
+                </div>
+            </header>
+
+            <!-- Report Summary Cards -->
+            <div class="stats-grid" id="summaryCards">
+                <!-- Populated by JS -->
+            </div>
+
+            <!-- Seller-wise Report -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Seller-wise Financial Report</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Seller</th>
+                                    <th>Location</th>
+                                    <th class="text-right">Initial Balance</th>
+                                    <th class="text-right">Total Payments</th>
+                                    <th class="text-right">Balance Left</th>
+                                    <th class="text-right">Pending</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sellerReport">
+                                <!-- Populated by JS -->
+                            </tbody>
+                            <tfoot id="reportFooter">
+                                <!-- Populated by JS -->
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Type Breakdown -->
+            <div class="card mt-2">
+                <div class="card-header">
+                    <h3>Payment Type Breakdown</h3>
+                </div>
+                <div class="card-body">
+                    <div class="grid-2" id="paymentTypeCards">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="js/api.js"></script>
+    <script>
+        // Check auth
+        if (!localStorage.getItem('token')) {
+            window.location.href = 'login.html';
+        }
+
+        let reportData = null;
+
+        // Load report data
+        async function loadReport() {
+            try {
+                reportData = await api.get('/reports/financial');
+                renderReport();
+            } catch (error) {
+                showToast('Error loading report', 'error');
+            }
+        }
+
+        function renderReport() {
+            if (!reportData) return;
+
+            // Summary cards
+            const summaryCards = document.getElementById('summaryCards');
+            summaryCards.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-icon primary">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-label">Total Initial Balance</div>
+                    <div class="stat-value">₹${formatNumber(reportData.summary.total_initial_balance)}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon primary">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-label">Total Payments</div>
+                    <div class="stat-value">₹${formatNumber(reportData.summary.total_payments)}</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-icon success">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-label">Cash in Hand</div>
+                    <div class="stat-value">₹${formatNumber(reportData.summary.cash_in_hand)}</div>
+                </div>
+                <div class="stat-card danger">
+                    <div class="stat-icon danger">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-label">Total Pending</div>
+                    <div class="stat-value">₹${formatNumber(reportData.summary.total_pending)}</div>
+                </div>
+            `;
+
+            // Seller report table
+            const tbody = document.getElementById('sellerReport');
+            tbody.innerHTML = reportData.by_seller.map(s => `
+                <tr>
+                    <td><strong>${s.name}</strong></td>
+                    <td>${s.location || '-'}</td>
+                    <td class="amount">₹${formatNumber(s.initial_balance)}</td>
+                    <td class="amount positive">₹${formatNumber(s.total_payments)}</td>
+                    <td class="amount">₹${formatNumber(s.balance_remaining)}</td>
+                    <td class="amount negative">₹${formatNumber(s.pending_amount)}</td>
+                </tr>
+            `).join('');
+
+            // Footer totals
+            const tfoot = document.getElementById('reportFooter');
+            tfoot.innerHTML = `
+                <tr style="background: var(--gray-50); font-weight: 600;">
+                    <td colspan="2">Total</td>
+                    <td class="amount">₹${formatNumber(reportData.summary.total_initial_balance)}</td>
+                    <td class="amount positive">₹${formatNumber(reportData.summary.total_payments)}</td>
+                    <td class="amount">₹${formatNumber(reportData.summary.cash_in_hand)}</td>
+                    <td class="amount negative">₹${formatNumber(reportData.summary.total_pending)}</td>
+                </tr>
+            `;
+
+            // Payment type cards
+            const typeCards = document.getElementById('paymentTypeCards');
+            const typeLabels = {
+                'cash': { label: 'Cash', icon: '💵' },
+                'bank_transfer': { label: 'Bank Transfer', icon: '🏦' },
+                'upi': { label: 'UPI', icon: '📱' },
+                'cheque': { label: 'Cheque', icon: '📝' }
+            };
+
+            typeCards.innerHTML = reportData.by_payment_type.map(t => {
+                const info = typeLabels[t.payment_type] || { label: t.payment_type, icon: '💰' };
+                return `
+                    <div class="seller-card">
+                        <div class="seller-header">
+                            <div>
+                                <div class="seller-name">${info.icon} ${info.label}</div>
+                                <div class="seller-location">${t.count} transactions</div>
+                            </div>
+                            <span class="badge badge-primary">₹${formatNumber(t.total)}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('') || '<p style="color: var(--gray-500);">No payment data available</p>';
+        }
+
+        async function exportJSON() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/reports/export/json', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `sellersync_backup_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+
+                showToast('JSON backup downloaded', 'success');
+            } catch (error) {
+                showToast('Error exporting data', 'error');
+            }
+        }
+
+        function printReport() {
+            const token = localStorage.getItem('token');
+            window.open(`/api/reports/printable?token=${token}`, '_blank');
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        // Init
+        loadReport();
+    </script>
+</body>
+
+</html>
