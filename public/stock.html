@@ -299,6 +299,11 @@
 
             <!-- Enhanced Filters -->
             <div class="filter-section">
+                <div style="flex: 2;">
+                    <label>Search</label>
+                    <input type="text" id="filterSearch" placeholder="Search by item name..."
+                        oninput="filterStockTable()">
+                </div>
                 <div>
                     <label>Seller</label>
                     <select id="filterSeller" onchange="loadStock()">
@@ -392,7 +397,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeStockModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="submitBulkStock()">Save All Items</button>
+                <button class="btn btn-primary" id="stockSaveBtn" onclick="submitStock()">Save All Items</button>
             </div>
         </div>
     </div>
@@ -521,6 +526,7 @@
 
         function openStockModal() {
             document.getElementById('stockModalTitle').textContent = 'Add Stock Items';
+            document.getElementById('stockSaveBtn').textContent = 'Save All Items';
             document.getElementById('stockForm').reset();
             document.getElementById('stockId').value = '';
             document.getElementById('stockItemsContainer').innerHTML = '';
@@ -531,6 +537,19 @@
 
         function closeStockModal() {
             document.getElementById('stockModal').classList.remove('active');
+        }
+
+        function filterStockTable() {
+            const searchTerm = document.getElementById('filterSearch').value.toLowerCase();
+            const rows = document.querySelectorAll('#stockTableBody tr');
+            rows.forEach(row => {
+                const itemName = row.querySelector('td[data-label="Item"]')?.textContent.toLowerCase() || '';
+                if (itemName.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
         }
 
         function addStockRow() {
@@ -643,6 +662,7 @@
             calculateBulkTotal();
 
             document.getElementById('stockModalTitle').textContent = 'Edit Stock Item';
+            document.getElementById('stockSaveBtn').textContent = 'Update Item';
             document.getElementById('stockModal').classList.add('active');
         }
 
