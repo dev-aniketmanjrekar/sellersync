@@ -37,14 +37,14 @@ router.get('/', verifyToken, async (req, res) => {
 // Get stock summary
 router.get('/summary', verifyToken, async (req, res) => {
     try {
-        // Total stock value (in_stock items)
+        // Total stock value (in_stock items) - multiply by available quantity
         const [stockValue] = await pool.query(
-            'SELECT COALESCE(SUM(cost_price), 0) AS total FROM stock_items WHERE status = "in_stock"'
+            'SELECT COALESCE(SUM(cost_price * (COALESCE(quantity, 1) - COALESCE(quantity_sold, 0))), 0) AS total FROM stock_items WHERE status = "in_stock"'
         );
         
-        // Stock count by status
+        // Stock count by status (sum of quantities)
         const [stockCount] = await pool.query(
-            'SELECT status, COUNT(*) as count FROM stock_items GROUP BY status'
+            'SELECT status, SUM(COALESCE(quantity, 1) - COALESCE(quantity_sold, 0)) as count FROM stock_items GROUP BY status'
         );
 
         // Per seller summary
@@ -73,15 +73,17 @@ router.get('/summary', verifyToken, async (req, res) => {
 // Add new stock item
 router.post('/', verifyToken, managerAccess, async (req, res) => {
     try {
-        const { seller_id, item_name, cost_price } = req.body;
+        const { seller_id, item_name, cost_price, quantity } = req.body;
 
         if (!seller_id || !item_name || !cost_price) {
             return res.status(400).json({ error: 'Seller, item name, and cost price are required.' });
         }
 
+        const qty = parseInt(quantity) || 1;
+
         const [result] = await pool.query(
-            'INSERT INTO stock_items (seller_id, item_name, cost_price) VALUES (?, ?, ?)',
-            [seller_id, item_name, cost_price]
+            'INSERT INTO stock_items (seller_id, item_name, cost_price, quantity, quantity_sold) VALUES (?, ?, ?, ?, 0)',
+            [seller_id, item_name, cost_price, qty]
         );
 
         res.status(201).json({
@@ -97,11 +99,11 @@ router.post('/', verifyToken, managerAccess, async (req, res) => {
 // Update stock item
 router.put('/:id', verifyToken, managerAccess, async (req, res) => {
     try {
-        const { item_name, cost_price } = req.body;
+        const { item_name, cost_price, quantity } = req.body;
 
         const [result] = await pool.query(
-            'UPDATE stock_items SET item_name = COALESCE(?, item_name), cost_price = COALESCE(?, cost_price) WHERE id = ?',
-            [item_name, cost_price, req.params.id]
+            'UPDATE stock_items SET item_name = COALESCE(?, item_name), cost_price = COALESCE(?, cost_price), quantity = COALESCE(?, quantity) WHERE id = ?',
+            [item_name, cost_price, quantity, req.params.id]
         );
 
         if (result.affectedRows === 0) {
