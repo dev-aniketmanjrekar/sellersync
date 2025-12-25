@@ -575,6 +575,13 @@
             }
         }
 
+        // Close modal on Escape key
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                closeSaleModal();
+            }
+        });
+
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
         }
