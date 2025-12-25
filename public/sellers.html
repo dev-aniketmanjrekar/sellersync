@@ -136,10 +136,6 @@
                         <label class="form-label">Phone</label>
                         <input type="tel" class="form-input" id="sellerPhone" placeholder="Phone number">
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Initial Balance (₹)</label>
-                        <input type="number" class="form-input" id="sellerBalance" placeholder="0" value="0">
-                    </div>
                     <div class="form-group mb-0">
                         <label class="form-label">Notes</label>
                         <input type="text" class="form-input" id="sellerNotes" placeholder="Additional notes">
@@ -164,12 +160,22 @@
         }
 
         let sellers = [];
+        let stockSummary = {};
 
         // Load sellers
         async function loadSellers() {
             try {
                 const response = await api.get('/sellers');
                 sellers = response;
+
+                // Load stock summary for each seller
+                const summaryResp = await api.get('/stock/summary');
+                if (summaryResp.sellerSummary) {
+                    summaryResp.sellerSummary.forEach(s => {
+                        stockSummary[s.id] = s;
+                    });
+                }
+
                 renderSellers();
             } catch (error) {
                 showToast('Error loading sellers', 'error');
@@ -184,7 +190,9 @@
                 return;
             }
 
-            grid.innerHTML = sellers.map(seller => `
+            grid.innerHTML = sellers.map(seller => {
+                const stock = stockSummary[seller.id] || { items_in_stock: 0, stock_value: 0, items_sold: 0 };
+                return `
                 <div class="seller-card">
                     <div class="seller-header">
                         <div>
@@ -197,28 +205,28 @@
                     </div>
                     <div class="seller-stats">
                         <div>
-                            <div class="seller-stat-label">Initial Balance</div>
-                            <div class="seller-stat-value">₹${formatNumber(seller.initial_balance)}</div>
+                            <div class="seller-stat-label">Stock Items</div>
+                            <div class="seller-stat-value">${stock.items_in_stock}</div>
                         </div>
                         <div>
-                            <div class="seller-stat-label">Total Paid</div>
-                            <div class="seller-stat-value" style="color: var(--success);">₹${formatNumber(seller.total_payments)}</div>
+                            <div class="seller-stat-label">Stock Value</div>
+                            <div class="seller-stat-value" style="color: var(--primary);">₹${formatNumber(stock.stock_value)}</div>
                         </div>
                         <div>
-                            <div class="seller-stat-label">Pending</div>
-                            <div class="seller-stat-value" style="color: var(--danger);">₹${formatNumber(seller.pending_amount)}</div>
+                            <div class="seller-stat-label">Items Sold</div>
+                            <div class="seller-stat-value" style="color: var(--success);">${stock.items_sold}</div>
                         </div>
                         <div>
-                            <div class="seller-stat-label">Balance Left</div>
-                            <div class="seller-stat-value">₹${formatNumber(seller.initial_balance - seller.total_payments)}</div>
+                            <div class="seller-stat-label">Payments Made</div>
+                            <div class="seller-stat-value" style="color: var(--warning);">₹${formatNumber(seller.total_payments || 0)}</div>
                         </div>
                     </div>
                     <div style="margin-top: var(--space-lg); display: flex; gap: var(--space-sm);">
                         <button class="btn btn-secondary" style="flex: 1;" onclick="editSeller(${seller.id})">Edit</button>
-                        <button class="btn btn-primary" style="flex: 1;" onclick="location.href='payments.html?seller=${seller.id}'">Payments</button>
+                        <button class="btn btn-primary" style="flex: 1;" onclick="location.href='stock.html?seller=${seller.id}'">Stock</button>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         // Modal functions
