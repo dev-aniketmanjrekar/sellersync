@@ -73,7 +73,7 @@ router.get('/summary', verifyToken, async (req, res) => {
 // Add new stock item
 router.post('/', verifyToken, managerAccess, async (req, res) => {
     try {
-        const { seller_id, item_name, cost_price, quantity } = req.body;
+        const { seller_id, item_name, cost_price, quantity, fabric_type } = req.body;
 
         if (!seller_id || !item_name || !cost_price) {
             return res.status(400).json({ error: 'Seller, item name, and cost price are required.' });
@@ -82,8 +82,8 @@ router.post('/', verifyToken, managerAccess, async (req, res) => {
         const qty = parseInt(quantity) || 1;
 
         const [result] = await pool.query(
-            'INSERT INTO stock_items (seller_id, item_name, cost_price, quantity, quantity_sold) VALUES (?, ?, ?, ?, 0)',
-            [seller_id, item_name, cost_price, qty]
+            'INSERT INTO stock_items (seller_id, item_name, cost_price, quantity, quantity_sold, fabric_type) VALUES (?, ?, ?, ?, 0, ?)',
+            [seller_id, item_name, cost_price, qty, fabric_type || null]
         );
 
         res.status(201).json({
@@ -99,11 +99,11 @@ router.post('/', verifyToken, managerAccess, async (req, res) => {
 // Update stock item
 router.put('/:id', verifyToken, managerAccess, async (req, res) => {
     try {
-        const { item_name, cost_price, quantity } = req.body;
+        const { item_name, cost_price, quantity, fabric_type } = req.body;
 
         const [result] = await pool.query(
-            'UPDATE stock_items SET item_name = COALESCE(?, item_name), cost_price = COALESCE(?, cost_price), quantity = COALESCE(?, quantity) WHERE id = ?',
-            [item_name, cost_price, quantity, req.params.id]
+            'UPDATE stock_items SET item_name = COALESCE(?, item_name), cost_price = COALESCE(?, cost_price), quantity = COALESCE(?, quantity), fabric_type = COALESCE(?, fabric_type) WHERE id = ?',
+            [item_name, cost_price, quantity, fabric_type, req.params.id]
         );
 
         if (result.affectedRows === 0) {
@@ -133,4 +133,18 @@ router.delete('/:id', verifyToken, managerAccess, async (req, res) => {
     }
 });
 
+// Get unique fabric types for autocomplete
+router.get('/fabric-types', verifyToken, async (req, res) => {
+    try {
+        const [fabrics] = await pool.query(
+            'SELECT DISTINCT fabric_type FROM stock_items WHERE fabric_type IS NOT NULL AND fabric_type != "" ORDER BY fabric_type'
+        );
+        res.json(fabrics.map(f => f.fabric_type));
+    } catch (error) {
+        console.error('Error fetching fabric types:', error);
+        res.status(500).json({ error: 'Server error fetching fabric types.' });
+    }
+});
+
 module.exports = router;
+

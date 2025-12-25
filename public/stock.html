@@ -330,6 +330,7 @@
                         <thead>
                             <tr>
                                 <th>Item Name</th>
+                                <th>Fabric</th>
                                 <th>Seller</th>
                                 <th>Cost/Unit</th>
                                 <th>Qty</th>
@@ -340,7 +341,7 @@
                         </thead>
                         <tbody id="stockTableBody">
                             <tr>
-                                <td colspan="7" class="empty-state">Loading...</td>
+                                <td colspan="8" class="empty-state">Loading...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -419,6 +420,7 @@
             await loadSellers();
             await loadStock();
             await loadSummary();
+            loadFabricTypes();
         }
 
         async function loadSellers() {
@@ -473,7 +475,7 @@
             const tbody = document.getElementById('stockTableBody');
 
             if (stockItems.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No stock items found</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No stock items found</td></tr>';
                 return;
             }
 
@@ -486,6 +488,7 @@
                 return `
                 <tr>
                     <td data-label="Item">${item.item_name}</td>
+                    <td data-label="Fabric">${item.fabric_type || '-'}</td>
                     <td data-label="Seller">${item.seller_name}</td>
                     <td data-label="Cost/Unit" class="amount">₹${costPerUnit.toLocaleString('en-IN')}</td>
                     <td data-label="Qty"><strong>${qtyAvailable}</strong>${item.quantity_sold > 0 ? ` <small style="color:#64748b">/ ${qty}</small>` : ''}</td>
@@ -552,14 +555,36 @@
             });
         }
 
+        let fabricTypes = [];
+
+        async function loadFabricTypes() {
+            try {
+                fabricTypes = await api.get('/stock/fabric-types');
+                updateFabricDatalist();
+            } catch (e) {
+                console.log('Could not load fabric types');
+            }
+        }
+
+        function updateFabricDatalist() {
+            let datalist = document.getElementById('fabricTypesList');
+            if (!datalist) {
+                datalist = document.createElement('datalist');
+                datalist.id = 'fabricTypesList';
+                document.body.appendChild(datalist);
+            }
+            datalist.innerHTML = fabricTypes.map(f => `<option value="${f}">`).join('');
+        }
+
         function addStockRow() {
             stockRowCounter++;
             const container = document.getElementById('stockItemsContainer');
             const row = document.createElement('div');
             row.id = `stockRow${stockRowCounter}`;
-            row.style.cssText = 'display: grid; grid-template-columns: 2fr 80px 100px 40px; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center;';
+            row.style.cssText = 'display: grid; grid-template-columns: 2fr 1fr 70px 90px 36px; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center;';
             row.innerHTML = `
                 <input type="text" class="form-input" placeholder="Item Name" data-field="name" style="padding: 0.5rem;">
+                <input type="text" class="form-input" placeholder="Fabric" data-field="fabric" list="fabricTypesList" style="padding: 0.5rem;" oninput="addNewFabricSuggestion(this)">
                 <input type="number" class="form-input" placeholder="Qty" value="1" min="1" data-field="qty" style="padding: 0.5rem;" oninput="calculateBulkTotal()">
                 <input type="number" class="form-input" placeholder="Price" step="0.01" data-field="price" style="padding: 0.5rem;" oninput="calculateBulkTotal()">
                 <button type="button" class="btn btn-sm btn-danger" onclick="removeStockRow(${stockRowCounter})" style="padding: 0.4rem;">
@@ -570,6 +595,13 @@
             `;
             container.appendChild(row);
             calculateBulkTotal();
+        }
+
+        function addNewFabricSuggestion(input) {
+            const val = input.value.trim();
+            if (val && !fabricTypes.includes(val)) {
+                // Will be added on save
+            }
         }
 
         function removeStockRow(id) {
@@ -609,11 +641,12 @@
 
             rows.forEach(row => {
                 const name = row.querySelector('[data-field="name"]').value.trim();
+                const fabric = row.querySelector('[data-field="fabric"]')?.value.trim() || '';
                 const qty = parseInt(row.querySelector('[data-field="qty"]').value) || 0;
                 const price = parseFloat(row.querySelector('[data-field="price"]').value) || 0;
 
                 if (name && qty > 0 && price > 0) {
-                    items.push({ item_name: name, quantity: qty, cost_price: price });
+                    items.push({ item_name: name, fabric_type: fabric, quantity: qty, cost_price: price });
                 }
             });
 
