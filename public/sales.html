@@ -107,72 +107,212 @@
                 Record Sale
             </button>
 
-            <!-- Summary Cards -->
-            <div class="summary-grid">
-                <div class="summary-card">
-                    <div class="summary-icon" style="background: #e8f5e9; color: var(--success);">
-                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"
-                            viewBox="0 0 24 24">
+            <!-- Enhanced Summary Cards -->
+            <style>
+                .sales-stats {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                    gap: 1.25rem;
+                    margin-bottom: 1.5rem;
+                }
+
+                .sales-stat-card {
+                    background: white;
+                    border-radius: 16px;
+                    padding: 1.5rem;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+                    border: 1px solid rgba(0, 0, 0, 0.04);
+                    display: flex;
+                    align-items: center;
+                    gap: 1rem;
+                    transition: transform 0.2s, box-shadow 0.2s;
+                }
+
+                .sales-stat-card:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+                }
+
+                .stat-icon-box {
+                    width: 56px;
+                    height: 56px;
+                    border-radius: 14px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-shrink: 0;
+                }
+
+                .stat-icon-box.green {
+                    background: linear-gradient(135deg, #11998e, #38ef7d);
+                }
+
+                .stat-icon-box.blue {
+                    background: linear-gradient(135deg, #667eea, #764ba2);
+                }
+
+                .stat-icon-box.gold {
+                    background: linear-gradient(135deg, #f2994a, #f2c94c);
+                }
+
+                .stat-icon-box svg {
+                    color: white;
+                    width: 28px;
+                    height: 28px;
+                }
+
+                .stat-info {
+                    flex: 1;
+                }
+
+                .stat-info .label {
+                    font-size: 0.8rem;
+                    color: #64748b;
+                    font-weight: 500;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    margin-bottom: 4px;
+                }
+
+                .stat-info .value {
+                    font-size: 1.75rem;
+                    font-weight: 700;
+                    color: #1e293b;
+                    line-height: 1;
+                }
+
+                .filter-section {
+                    background: white;
+                    border-radius: 12px;
+                    padding: 1rem 1.25rem;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+                    margin-bottom: 1.5rem;
+                    display: flex;
+                    gap: 1rem;
+                    flex-wrap: wrap;
+                    align-items: center;
+                }
+
+                .filter-section label {
+                    font-size: 0.75rem;
+                    color: #64748b;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    margin-bottom: 4px;
+                    display: block;
+                }
+
+                .filter-section select {
+                    padding: 0.5rem 2rem 0.5rem 0.75rem;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 8px;
+                    font-size: 0.875rem;
+                    background: #f8fafc;
+                    cursor: pointer;
+                    min-width: 140px;
+                }
+
+                .filter-section select:focus {
+                    outline: none;
+                    border-color: #667eea;
+                    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+                }
+
+                .sales-table-card {
+                    background: white;
+                    border-radius: 16px;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+                    overflow: hidden;
+                }
+
+                .sales-table-header {
+                    padding: 1.25rem 1.5rem;
+                    border-bottom: 1px solid #f1f5f9;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+
+                .sales-table-header h3 {
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                    color: #1e293b;
+                    margin: 0;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                }
+
+                .sales-table-header h3::before {
+                    content: '';
+                    width: 4px;
+                    height: 20px;
+                    background: linear-gradient(135deg, #11998e, #38ef7d);
+                    border-radius: 4px;
+                }
+            </style>
+
+            <div class="sales-stats">
+                <div class="sales-stat-card">
+                    <div class="stat-icon-box green">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path
                                 d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
-                    <div class="summary-content">
-                        <span class="summary-label">Total Sales</span>
-                        <span class="summary-value" id="totalSales">₹0</span>
+                    <div class="stat-info">
+                        <div class="label">Total Sales</div>
+                        <div class="value" id="totalSales">₹0</div>
                     </div>
                 </div>
-                <div class="summary-card">
-                    <div class="summary-icon" style="background: var(--primary-light); color: var(--primary);">
-                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"
-                            viewBox="0 0 24 24">
+                <div class="sales-stat-card">
+                    <div class="stat-icon-box blue">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path
                                 d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
                         </svg>
                     </div>
-                    <div class="summary-content">
-                        <span class="summary-label">Total Profit</span>
-                        <span class="summary-value" id="totalProfit">₹0</span>
+                    <div class="stat-info">
+                        <div class="label">Total Profit</div>
+                        <div class="value" id="totalProfit">₹0</div>
                     </div>
                 </div>
-                <div class="summary-card">
-                    <div class="summary-icon" style="background: #fff3e0; color: var(--warning);">
-                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"
-                            viewBox="0 0 24 24">
+                <div class="sales-stat-card">
+                    <div class="stat-icon-box gold">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path
                                 d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
                     </div>
-                    <div class="summary-content">
-                        <span class="summary-label">Rolling Cash</span>
-                        <span class="summary-value" id="rollingCash">₹0</span>
+                    <div class="stat-info">
+                        <div class="label">Rolling Cash</div>
+                        <div class="value" id="rollingCash">₹0</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Filters -->
-            <div class="filter-bar">
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <label>Seller</label>
-                        <select id="filterSeller" onchange="loadSales()">
-                            <option value="">All Sellers</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Payment</label>
-                        <select id="filterPayment" onchange="loadSales()">
-                            <option value="">All</option>
-                            <option value="cash">Cash</option>
-                            <option value="online">Online</option>
-                        </select>
-                    </div>
+            <!-- Enhanced Filters -->
+            <div class="filter-section">
+                <div>
+                    <label>Seller</label>
+                    <select id="filterSeller" onchange="loadSales()">
+                        <option value="">All Sellers</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Payment</label>
+                    <select id="filterPayment" onchange="loadSales()">
+                        <option value="">All</option>
+                        <option value="cash">Cash</option>
+                        <option value="online">Online</option>
+                    </select>
                 </div>
             </div>
 
-            <!-- Sales Table -->
-            <div class="data-card">
-                <div class="card-header">
+            <!-- Enhanced Sales Table -->
+            <div class="sales-table-card">
+                <div class="sales-table-header">
                     <h3>Sales History</h3>
                 </div>
                 <div class="table-container">
