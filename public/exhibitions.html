@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SellerSync - Exhibitions</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- Mobile Menu Toggle -->
+    <button class="hamburger" onclick="toggleSidebar()">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12h18M3 6h18M3 18h18" />
+        </svg>
+    </button>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">SS</div>
+                <span class="sidebar-title">SellerSync</span>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    Dashboard
+                </a>
+                <a href="sellers.html" class="nav-item">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path
+                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    Sellers
+                </a>
+                <a href="stock.html" class="nav-item">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                    Stock
+                </a>
+                <a href="sales.html" class="nav-item">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path
+                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    Sales
+                </a>
+                <a href="exhibitions.html" class="nav-item active">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path
+                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    Exhibitions
+                </a>
+                <a href="payments.html" class="nav-item">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path
+                            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    Payments
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path
+                            d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Reports
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="nav-item" onclick="logout()">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Logout
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <header class="page-header">
+                <div class="page-title">
+                    <h1>Exhibitions</h1>
+                    <p>Track exhibitions where you sell items</p>
+                </div>
+                <button class="btn btn-primary" onclick="openExhibitionModal()">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M12 4v16m8-8H4" />
+                    </svg>
+                    Add Exhibition
+                </button>
+            </header>
+
+            <!-- Enhanced Summary Cards -->
+            <style>
+                .exhibition-stats {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                    gap: 1.25rem;
+                    margin-bottom: 1.5rem;
+                }
+
+                .exhibition-stat-card {
+                    background: white;
+                    border-radius: 16px;
+                    padding: 1.5rem;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+                    border: 1px solid rgba(0, 0, 0, 0.04);
+                    display: flex;
+                    align-items: center;
+                    gap: 1rem;
+                    transition: transform 0.2s, box-shadow 0.2s;
+                }
+
+                .exhibition-stat-card:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+                }
+
+                .stat-icon-box {
+                    width: 56px;
+                    height: 56px;
+                    border-radius: 14px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-shrink: 0;
+                }
+
+                .stat-icon-box.purple {
+                    background: linear-gradient(135deg, #667eea, #764ba2);
+                }
+
+                .stat-icon-box.blue {
+                    background: linear-gradient(135deg, #4facfe, #00f2fe);
+                }
+
+                .stat-icon-box.green {
+                    background: linear-gradient(135deg, #11998e, #38ef7d);
+                }
+
+                .stat-icon-box.gold {
+                    background: linear-gradient(135deg, #f2994a, #f2c94c);
+                }
+
+                .stat-icon-box svg {
+                    color: white;
+                    width: 28px;
+                    height: 28px;
+                }
+
+                .stat-info {
+                    flex: 1;
+                }
+
+                .stat-info .stat-label {
+                    font-size: 0.8rem;
+                    color: #64748b;
+                    font-weight: 500;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    margin-bottom: 4px;
+                }
+
+                .stat-info .stat-value {
+                    font-size: 1.75rem;
+                    font-weight: 700;
+                    color: #1e293b;
+                    line-height: 1;
+                }
+
+                .exhibitions-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+                    gap: 1.25rem;
+                }
+
+                .exhibition-card {
+                    background: white;
+                    border-radius: 16px;
+                    padding: 1.5rem;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+                    transition: transform 0.2s, box-shadow 0.2s;
+                }
+
+                .exhibition-card:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+                }
+
+                .exhibition-card-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-start;
+                    margin-bottom: 1rem;
+                }
+
+                .exhibition-name {
+                    font-size: 1.125rem;
+                    font-weight: 600;
+                    color: #1e293b;
+                }
+
+                .exhibition-location {
+                    font-size: 0.875rem;
+                    color: #64748b;
+                }
+
+                .exhibition-dates {
+                    font-size: 0.75rem;
+                    color: #94a3b8;
+                    margin-top: 0.25rem;
+                }
+
+                .exhibition-stats-row {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 1rem;
+                    margin-top: 1rem;
+                    padding-top: 1rem;
+                    border-top: 1px solid #f1f5f9;
+                }
+
+                .exhibition-stat {
+                    text-align: center;
+                }
+
+                .exhibition-stat-label {
+                    font-size: 0.7rem;
+                    color: #64748b;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+
+                .exhibition-stat-value {
+                    font-size: 1.25rem;
+                    font-weight: 700;
+                    color: #1e293b;
+                }
+
+                .exhibition-stat-value.profit {
+                    color: #10b981;
+                }
+            </style>
+
+            <div class="exhibition-stats">
+                <div class="exhibition-stat-card">
+                    <div class="stat-icon-box purple">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path
+                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-label">Total Exhibitions</div>
+                        <div class="stat-value" id="totalExhibitions">0</div>
+                    </div>
+                </div>
+                <div class="exhibition-stat-card">
+                    <div class="stat-icon-box blue">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-label">Active</div>
+                        <div class="stat-value" id="activeExhibitions">0</div>
+                    </div>
+                </div>
+                <div class="exhibition-stat-card">
+                    <div class="stat-icon-box green">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path
+                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-label">Total Sales</div>
+                        <div class="stat-value" id="totalSales">₹0</div>
+                    </div>
+                </div>
+                <div class="exhibition-stat-card">
+                    <div class="stat-icon-box gold">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path
+                                d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-label">Total Profit</div>
+                        <div class="stat-value" id="totalProfit">₹0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exhibitions Grid -->
+            <div class="exhibitions-grid" id="exhibitionsGrid">
+                <div class="exhibition-card">
+                    <p style="text-align: center; color: #64748b;">Loading...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Exhibition Modal -->
+    <div class="modal-overlay" id="exhibitionModal">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3 id="exhibitionModalTitle">Add Exhibition</h3>
+                <button class="btn btn-icon btn-secondary" onclick="closeExhibitionModal()">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="exhibitionForm">
+                    <input type="hidden" id="exhibitionId">
+                    <div class="form-group">
+                        <label class="form-label">Exhibition Name *</label>
+                        <input type="text" class="form-input" id="exhibitionName" placeholder="e.g., Diwali Mela 2024"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Location</label>
+                        <input type="text" class="form-input" id="exhibitionLocation"
+                            placeholder="e.g., Mumbai Exhibition Center">
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Start Date</label>
+                            <input type="date" class="form-input" id="exhibitionStartDate">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">End Date</label>
+                            <input type="date" class="form-input" id="exhibitionEndDate">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select class="form-input" id="exhibitionStatus">
+                            <option value="upcoming">Upcoming</option>
+                            <option value="active">Active</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Notes</label>
+                        <input type="text" class="form-input" id="exhibitionNotes" placeholder="Optional notes">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeExhibitionModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitExhibition()">Save Exhibition</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="js/api.js"></script>
+    <script>
+        let exhibitions = [];
+
+        // Check auth
+        if (!localStorage.getItem('token')) {
+            window.location.href = 'login.html';
+        }
+
+        // Load data
+        async function loadData() {
+            await loadExhibitions();
+            await loadSummary();
+        }
+
+        async function loadExhibitions() {
+            try {
+                exhibitions = await api.get('/exhibitions');
+                renderExhibitions();
+            } catch (error) {
+                showToast('Error loading exhibitions', 'error');
+            }
+        }
+
+        async function loadSummary() {
+            try {
+                const summary = await api.get('/exhibitions/summary');
+                document.getElementById('totalExhibitions').textContent = summary.totalExhibitions;
+                document.getElementById('activeExhibitions').textContent = summary.activeExhibitions;
+                document.getElementById('totalSales').textContent = '₹' + parseFloat(summary.totalSales || 0).toLocaleString('en-IN');
+                document.getElementById('totalProfit').textContent = '₹' + parseFloat(summary.totalProfit || 0).toLocaleString('en-IN');
+            } catch (error) {
+                console.error('Error loading summary:', error);
+            }
+        }
+
+        function renderExhibitions() {
+            const grid = document.getElementById('exhibitionsGrid');
+
+            if (exhibitions.length === 0) {
+                grid.innerHTML = `
+                    <div class="exhibition-card">
+                        <p style="text-align: center; color: #64748b;">No exhibitions yet. Click "Add Exhibition" to create one.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = exhibitions.map(e => {
+                const statusColors = {
+                    'upcoming': 'badge-warning',
+                    'active': 'badge-success',
+                    'completed': 'badge-primary'
+                };
+                const dates = [];
+                if (e.start_date) dates.push(new Date(e.start_date).toLocaleDateString('en-IN'));
+                if (e.end_date) dates.push(new Date(e.end_date).toLocaleDateString('en-IN'));
+
+                return `
+                    <div class="exhibition-card">
+                        <div class="exhibition-card-header">
+                            <div>
+                                <div class="exhibition-name">${e.name}</div>
+                                <div class="exhibition-location">${e.location || 'No location'}</div>
+                                ${dates.length ? `<div class="exhibition-dates">${dates.join(' - ')}</div>` : ''}
+                            </div>
+                            <span class="badge ${statusColors[e.status] || 'badge-primary'}">${e.status}</span>
+                        </div>
+                        <div class="exhibition-stats-row">
+                            <div class="exhibition-stat">
+                                <div class="exhibition-stat-label">Sales</div>
+                                <div class="exhibition-stat-value">₹${parseFloat(e.total_sales || 0).toLocaleString('en-IN')}</div>
+                            </div>
+                            <div class="exhibition-stat">
+                                <div class="exhibition-stat-label">Profit</div>
+                                <div class="exhibition-stat-value profit">₹${parseFloat(e.total_profit || 0).toLocaleString('en-IN')}</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                            <button class="btn btn-secondary" style="flex: 1;" onclick="editExhibition(${e.id})">Edit</button>
+                            <button class="btn btn-danger" style="flex: 1;" onclick="deleteExhibition(${e.id})">Delete</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Modal functions
+        function openExhibitionModal(id = null) {
+            document.getElementById('exhibitionModalTitle').textContent = id ? 'Edit Exhibition' : 'Add Exhibition';
+            document.getElementById('exhibitionForm').reset();
+            document.getElementById('exhibitionId').value = id || '';
+            document.getElementById('exhibitionModal').classList.add('active');
+        }
+
+        function closeExhibitionModal() {
+            document.getElementById('exhibitionModal').classList.remove('active');
+        }
+
+        async function editExhibition(id) {
+            const exhibition = exhibitions.find(e => e.id === id);
+            if (!exhibition) return;
+
+            document.getElementById('exhibitionId').value = exhibition.id;
+            document.getElementById('exhibitionName').value = exhibition.name;
+            document.getElementById('exhibitionLocation').value = exhibition.location || '';
+            document.getElementById('exhibitionStartDate').value = exhibition.start_date ? exhibition.start_date.split('T')[0] : '';
+            document.getElementById('exhibitionEndDate').value = exhibition.end_date ? exhibition.end_date.split('T')[0] : '';
+            document.getElementById('exhibitionStatus').value = exhibition.status || 'upcoming';
+            document.getElementById('exhibitionNotes').value = exhibition.notes || '';
+
+            document.getElementById('exhibitionModalTitle').textContent = 'Edit Exhibition';
+            document.getElementById('exhibitionModal').classList.add('active');
+        }
+
+        async function submitExhibition() {
+            const id = document.getElementById('exhibitionId').value;
+            const data = {
+                name: document.getElementById('exhibitionName').value,
+                location: document.getElementById('exhibitionLocation').value,
+                start_date: document.getElementById('exhibitionStartDate').value || null,
+                end_date: document.getElementById('exhibitionEndDate').value || null,
+                status: document.getElementById('exhibitionStatus').value,
+                notes: document.getElementById('exhibitionNotes').value
+            };
+
+            if (!data.name) {
+                showToast('Exhibition name is required', 'error');
+                return;
+            }
+
+            try {
+                if (id) {
+                    await api.put(`/exhibitions/${id}`, data);
+                    showToast('Exhibition updated successfully', 'success');
+                } else {
+                    await api.post('/exhibitions', data);
+                    showToast('Exhibition added successfully', 'success');
+                }
+                closeExhibitionModal();
+                loadData();
+            } catch (error) {
+                showToast(error.message || 'Error saving exhibition', 'error');
+            }
+        }
+
+        async function deleteExhibition(id) {
+            if (!confirm('Delete this exhibition? Sales linked to it will be unlinked.')) return;
+
+            try {
+                await api.delete(`/exhibitions/${id}`);
+                showToast('Exhibition deleted', 'success');
+                loadData();
+            } catch (error) {
+                showToast(error.message || 'Error deleting exhibition', 'error');
+            }
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                closeExhibitionModal();
+            }
+        });
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Init
+        loadData();
+    </script>
+</body>
+
+</html>

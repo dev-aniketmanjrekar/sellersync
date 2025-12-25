@@ -20,6 +20,7 @@ app.use("/api/payments", require("./routes/payments"));
 app.use("/api/reports", require("./routes/reports"));
 app.use("/api/stock", require("./routes/stock"));
 app.use("/api/sales", require("./routes/sales"));
+app.use("/api/exhibitions", require("./routes/exhibitions"));
 
 // Serve index.html for root route
 app.get("/", (req, res) => {
