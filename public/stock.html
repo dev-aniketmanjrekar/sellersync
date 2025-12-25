@@ -408,11 +408,15 @@
     </div>
 
     <!-- Add/Edit Stock Modal -->
-    <div class="modal" id="stockModal">
-        <div class="modal-content">
+    <div class="modal-overlay" id="stockModal">
+        <div class="modal" style="max-width: 500px;">
             <div class="modal-header">
-                <h2 id="stockModalTitle">Add Stock Item</h2>
-                <button class="modal-close" onclick="closeStockModal()">&times;</button>
+                <h3 id="stockModalTitle">Add Stock Item</h3>
+                <button class="btn btn-icon btn-secondary" onclick="closeStockModal()">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
             <div class="modal-body">
                 <form id="stockForm">

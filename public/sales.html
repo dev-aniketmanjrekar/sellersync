@@ -412,11 +412,15 @@
     </div>
 
     <!-- Record Sale Modal -->
-    <div class="modal" id="saleModal">
-        <div class="modal-content">
+    <div class="modal-overlay" id="saleModal">
+        <div class="modal" style="max-width: 500px;">
             <div class="modal-header">
-                <h2>Record Sale</h2>
-                <button class="modal-close" onclick="closeSaleModal()">&times;</button>
+                <h3>Record Sale</h3>
+                <button class="btn btn-icon btn-secondary" onclick="closeSaleModal()">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
             <div class="modal-body">
                 <form id="saleForm">
